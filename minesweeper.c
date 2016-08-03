@@ -22,6 +22,35 @@
 #define KCYN  "\x1B[36m"
 #define KWHT  "\x1B[37m"
 
+#define BIT(x) (0x01 << (x))
+#define BITMASK_SET(x,y) ((x) |= (y))
+#define BITMASK_CLEAR(x,y) ((x) &= (~(y)))
+#define BITMASK_FLTIP(x,y) ((x) ^= (y))
+#define BITMASK_CHECK(x,y) (((x) & (y)) == (y))
+
+const unsigned int FlAG_MASK = BIT(4);
+const unsigned int UNCOVERED_MASK = BIT(5);
+const unsigned int MINE_MASK = BIT(6);
+
+inline _Bool has_mine(unsigned int cell){
+	return BITMASK_CHECK(cell, MINE_MASK);
+}
+
+inline void put_mine(unsigned int cell){
+	BITMASK_SET(cell,MINE_MASK);
+}
+
+inline unsigned int num_mines(unsigned int cell){
+	return 
+}
+
+inline void is_uncovered(unsigned int cell){
+	BITMASK_SET(cell,UNCOVERED_MASK);
+}
+
+inline void is_flagged(unsigned int cell){
+	BITMASK_SET(cell,FLAG_MASK);
+}
 
 // global variables
 // game table
@@ -92,16 +121,16 @@ void print_table() {
             }
             value = table_array[i][j];
 
-            if((value >= 0 && value <= 8) || value == 0 || value == 99)
+            if(is_uncovered(value))
                 printf("|X");
-            else if(value == 10) // clean area
+	    else if(is_flagged(value))
+		 printf("|%sF%s",KGRN,KNRM);
+            else if(num_mines(value)==0) 
                 printf("|%s%d%s",KCYN, value - 10,KNRM);
-            else if(value == 11) // the number of near mine is 1
+            else if(num_mines(value)==1) 
                 printf("|%s%d%s",KYEL, value - 10,KNRM);
-            else if(value > 11 && value <= 18) // the number of near mine is greater than 1
+            else if(num_mines(value)>1) 
                 printf("|%s%d%s",KRED, value - 10,KNRM);
-            else if((value >= 20 && value <= 28) || value == 100)
-                printf("|%sF%s",KGRN,KNRM);
             else
                 printf("ERROR"); // test purposes
 
