@@ -60,8 +60,7 @@ int uncover_blank_cell(int row, int col) {
 
     for(i = 0; i < 8; i++) {
         value = table_array[rows[i]][columns[i]];
-
-        if( (rows[i] >= 0 && rows[i] < MAX) && (columns[i] >= 0 && columns[i] < MAX) ) {	// to prevent negative index and out of bounds
+        if( (rows[i] >= 0 && rows[i] < MAX) && (columns[i] >= 0 && columns[i] < MAX) ) {	   // to prevent negative index and out of bounds
             if(value > 0 && value <= 8)
                 table_array[rows[i]][columns[i]] += 10;										// it is a cell with 1-8 number so we need to uncover
             else if(value == 0)
@@ -127,14 +126,13 @@ int main(int argc, char *argv[]) {
     char ch;
     int numberMines; // the number of the remaining mines
     int i,j,r,c,value, rows[8], columns[8];
-
 new_game:
     // the number of mines
     numberMines = 10;
     if(argc == 2) {
         numberMines = atoi(argv[1]);
     }
-    srand (time(NULL));						// random seed
+    srand (time(NULL));                                         // random seed
     // setting cursor
     x = 0;
     y = 0;
@@ -146,7 +144,7 @@ new_game:
     for(i = 0; i < numberMines; i++) {
         /* initialize random seed: */
 
-        r = rand() % 10;					// it generates a integer in the range 0 to 9
+        r = rand() % 10;                                        // it generates a integer in the range 0 to 9
         c = rand() % 10;
 
         // put mines
@@ -173,18 +171,17 @@ new_game:
 
             for(j = 0; j < 8; j++) {
                 value = table_array[rows[j]][columns[j]];
-                if( (rows[j] >= 0 && rows[j] < MAX) && (columns[j] >= 0 && columns[j] < MAX) ) {	// to prevent negative index and out of bounds
-                    if(value != 99)																// to prevent remove mines
-                        table_array[rows[j]][columns[j]] += 1;									// sums 1 to each adjacent cell
+                if( (rows[j] >= 0 && rows[j] < MAX) && (columns[j] >= 0 && columns[j] < MAX) ) {        // to prevent negative index and out of bounds
+                    if(value != 99)                                                                                                                             // to prevent remove mines
+                        table_array[rows[j]][columns[j]] += 1;                                                                  // sums 1 to each adjacent cell
                 }
             }
 
-        } else {							// to make sure that there are the properly number of mines in table
+        } else {                                                        // to make sure that there are the properly number of mines in table
             i--;
             continue;
         }
     }
-
     //
     while(numberMines != 0) {			// when nMines becomes 0 you will win the game
         print_table();
@@ -197,9 +194,6 @@ new_game:
         // flag
         case 'f':
         case 'F':
-
-
-flag_mode:
             game_mode = 1;
             do {
                 print_table();
@@ -216,7 +210,7 @@ flag_mode:
                 } else if(direction == '6') {
                     x = ++x % MAX;
                 } else if(direction == 'c' || direction == 'C') {
-                    goto check_mode;
+                    continue;
                 } else if(direction == '\n') {
                     value = table_array[y][x];
 
@@ -240,8 +234,6 @@ flag_mode:
         // check cell
         case 'c':
         case 'C':
-
-check_mode:
             game_mode = 2;
             do {
                 print_table();
@@ -259,7 +251,7 @@ check_mode:
                 } else if(direction == '6') {
                     x = ++x % MAX;
                 } else if(direction == 'f' || direction == 'F') {
-                    goto flag_mode;
+                    continue;
                 }
 
                 else if(direction == '\n') {
@@ -267,7 +259,7 @@ check_mode:
                     if(value == 0)						// blank case
                         uncover_blank_cell(y, x);
                     else if(value == 99)				// mine case
-                        goto end_of_game;
+                        continue;
                     else if(value > 0 && value <= 8)	// number case (the next cell is a mine)
                         table_array[y][x] += 10;
 
@@ -289,38 +281,38 @@ check_mode:
         // exit
         case 'q':
         case 'Q':
-            goto end_of_game;
+                game_mode = 0;
+		print_table();
+    		printf("\nGAME OVER\n");
+
+    		if(numberMines == 0)
+        		printf("you won!!!!\n");
+
+    		else
+        		printf("BOOM! you LOOSE!\n");
+
+    		do {
+        	    printf("Are you sure to exit? (y or n)? ");
+                	ch = getch();
+        		putchar('\n');
+        		if(ch == 'y' || ch == 'Y') {
+            			break;
+        		} else if(ch == 'n' || ch == 'N') {
+           			goto new_game;
+				break;
+       			}
+                	 printf("Please answer y or n\n");
+   		 } while(1);
+   		 printf("See you next time!\n");
+
+		 fflush(stdin);
+		 break;
+    		
 
         default:
             break;
         }
+	break;
     }
-
-end_of_game:
-    game_mode = 0;
-    print_table();
-    printf("\nGAME OVER\n");
-
-    if(numberMines == 0)
-        printf("you won!!!!\n");
-
-    else
-        printf("BOOM! you LOOSE!\n");
-
-    do {
-        printf("Are you sure to exit? (y or n)? ");
-        ch = getch();
-        putchar('\n');
-        if(ch == 'y' || ch == 'Y') {
-            break;
-        } else if(ch == 'n' || ch == 'N') {
-            goto new_game;
-        }
-        printf("Please answer y or n\n");
-    } while(1);
-    printf("See you next time!\n");
-
-    fflush(stdin);
-
     return 0;
 }
